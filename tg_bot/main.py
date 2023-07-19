@@ -1,6 +1,16 @@
 import config
 import telebot as tb
 import re
+import psycopg2 as psc
+
+
+def exec_query(query: str) -> "list[tuple[str]]":
+    with psc.connect(dbname=config.dbname, user=config.dbuser) as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(query);
+            connection.commit()
+            res = cursor.fetchall()
+    return res
 
 bot = tb.TeleBot(config.token)
 
@@ -41,8 +51,12 @@ def main(message):
     if info[5].lower() not in ["музыка", "сходка", "иное"]:
         bot.send_message(message.chat.id, "Неправильная категория, можно только что-то из этого: музыка, сходка, иное\nМожешь написать /help, чтобы посмотреть пример")
         return
+    
+    try:
+        exec_query(f"""insert into news (time, date, name, description, place, category) values ('{info[0]}', '{info[1]}', '{info[2]}', '{info[3]}', '{info[4]}', '{info[5]}')""")
+    except psc.ProgrammingError:
+        pass
 
-    [print(x) for x in info]
     bot.send_message(message.chat.id, "Все хорошо, записал")
     bot.send_message(config.channel_id, f"""Название: "{info[2]}"
 Описание: {info[3]}

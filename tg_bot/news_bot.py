@@ -72,6 +72,46 @@ def change_info_and_post(message) -> None:
 {info[6]}
 #{info[5]}""")
 
+def ask_to_add_pic(message, info: list[str]) -> None:
+    if message.text.lower() == "нет":
+        bot.send_message(message.chat.id, "Все хорошо, записал")
+        bot.send_message(config.channel_id, f""""{info[2]}"\n
+{info[3]}\n
+{'В ' if len(info[0]) == 5 else ''}{info[0]}
+{info[1]}
+{info[4]}
+{info[6]}
+#{info[5]}""")
+        return
+
+    bot.send_message(message.chat.id, "Отправь сюда картинку, которую хочешь добавить\nНапиши 'отмена', чтобы отменить добавление картинки")
+    bot.register_next_step_handler(message, add_pic, info)
+
+def add_pic(message, info: list[str]) -> None:
+    if message.text is not None and message.text.lower() == "отмена":
+        bot.send_message(message.chat.id, "Все хорошо, записал")
+        bot.send_message(config.channel_id, f""""{info[2]}"\n
+{info[3]}\n
+{'В ' if len(info[0]) == 5 else ''}{info[0]}
+{info[1]}
+{info[4]}
+{info[6]}
+#{info[5]}""")
+        return
+    file = bot.download_file(bot.get_file(message.photo[-1].file_id).file_path)
+    
+    bot.send_message(message.chat.id, "Все хорошо, записал")
+    bot.send_photo(config.channel_id, file, caption=f""""{info[2]}"\n
+{info[3]}\n
+{'В ' if len(info[0]) == 5 else ''}{info[0]}
+{info[1]}
+{info[4]}
+{info[6]}
+#{info[5]}""")
+
+yn_keyboard = tb.types.ReplyKeyboardMarkup()
+yn_keyboard.row("Да", "Нет")
+
 bot = tb.TeleBot(config.token)
 
 @bot.message_handler(commands=["start", "help"])
@@ -106,14 +146,8 @@ def main(message):
     except psc.ProgrammingError:
         pass
 
-    bot.send_message(message.chat.id, "Все хорошо, записал")
-    bot.send_message(config.channel_id, f""""{info[2]}"\n
-{info[3]}\n
-{'В ' if len(info[0]) == 5 else ''}{info[0]}
-{info[1]}
-{info[4]}
-{info[6]}
-#{info[5]}""")
+    bot.send_message(message.chat.id, "Картинку добавить?", reply_markup=yn_keyboard)
+    bot.register_next_step_handler(message, ask_to_add_pic, info)
 
 bot.polling(non_stop=True)
 

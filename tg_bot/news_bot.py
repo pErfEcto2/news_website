@@ -109,7 +109,7 @@ def add_pic(message, info: list[str]) -> None:
 {info[6]}
 #{info[5]}""")
 
-yn_keyboard = tb.types.ReplyKeyboardMarkup()
+yn_keyboard = tb.types.ReplyKeyboardMarkup(one_time_keyboard=True)
 yn_keyboard.row("Да", "Нет")
 
 bot = tb.TeleBot(config.token)

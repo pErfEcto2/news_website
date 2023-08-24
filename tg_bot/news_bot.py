@@ -123,6 +123,7 @@ def say_hi(message):
     bot.send_message(message.chat.id, "С 12:00 до 18:00\n24 ноября 2024\nКрутое событие\nЭто событие будет во истину крутым, все приходите\nУлица Пушкина, 10\nМузыка\n1200 рублей")
     bot.send_message(message.chat.id, "Другой пример:")
     bot.send_message(message.chat.id, "12.00\n12 ноября 2024\nХорошее мероприятие\nРеально хорошее мероприятие\nТРЦ Солнышко\nИное\nБесплатно")
+    bot.send_message(message.chat.id, "После ввода текста ты можешь добавить(или не добавлять) картинку, чтобы пост был в виде картинки и подписи к ней")
 
 
 @bot.message_handler(content_types=["text"])
